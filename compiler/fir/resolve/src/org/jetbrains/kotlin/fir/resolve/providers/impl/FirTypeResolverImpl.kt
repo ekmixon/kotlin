@@ -19,6 +19,7 @@ import org.jetbrains.kotlin.fir.resolve.substitution.ConeSubstitutor
 import org.jetbrains.kotlin.fir.scopes.FirScope
 import org.jetbrains.kotlin.fir.symbols.ConeTypeParameterLookupTag
 import org.jetbrains.kotlin.fir.symbols.impl.*
+import org.jetbrains.kotlin.fir.typeContext
 import org.jetbrains.kotlin.fir.types.*
 import org.jetbrains.kotlin.fir.types.impl.ConeClassLikeTypeImpl
 import org.jetbrains.kotlin.fir.types.impl.ConeTypeParameterTypeImpl
@@ -172,6 +173,19 @@ class FirTypeResolverImpl(private val session: FirSession) : FirTypeResolver() {
         )
     }
 
+    private fun createUnionType(
+        typeRef: FirUnionTypeRef,
+        scope: FirScope,
+        areBareTypesAllowed: Boolean
+    ): ConeUnionType {
+        val resolvedTypes = typeRef.nestedTypes.map { resolveType(it, scope, areBareTypesAllowed) }
+
+        val commonSuperType = session.typeContext.commonSuperTypeOrNull(resolvedTypes)
+            ?: error(typeRef.render())
+
+        return ConeUnionType(resolvedTypes, commonSuperType)
+    }
+
     override fun resolveType(
         typeRef: FirTypeRef,
         scope: FirScope,
@@ -184,6 +198,7 @@ class FirTypeResolverImpl(private val session: FirSession) : FirTypeResolver() {
                 resolveUserType(typeRef, symbol, substitutor, areBareTypesAllowed)
             }
             is FirFunctionTypeRef -> createFunctionalType(typeRef)
+            is FirUnionTypeRef -> createUnionType(typeRef, scope, areBareTypesAllowed)
             is FirDynamicTypeRef -> ConeKotlinErrorType(ConeUnsupportedDynamicType())
             else -> error(typeRef.render())
         }
