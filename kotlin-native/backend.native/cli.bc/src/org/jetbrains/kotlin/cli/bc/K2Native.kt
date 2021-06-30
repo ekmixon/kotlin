@@ -309,6 +309,8 @@ class K2Native : CLICompiler<K2NativeCompilerArguments>() {
                         true
                     }
                 })
+
+                arguments.externalDependencies?.let { put(EXTERNAL_DEPENDENCIES, it) }
             }
         }
     }
