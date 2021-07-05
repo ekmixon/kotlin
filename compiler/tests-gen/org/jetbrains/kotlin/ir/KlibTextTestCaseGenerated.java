@@ -2036,6 +2036,11 @@ public class KlibTextTestCaseGenerated extends AbstractKlibTextTestCase {
             runTest("compiler/testData/ir/irText/types/typeAliasWithUnsafeVariance.kt");
         }
 
+        @TestMetadata("unionTypes.kt")
+        public void testUnionTypes() throws Exception {
+            runTest("compiler/testData/ir/irText/types/unionTypes.kt");
+        }
+
         @TestMetadata("compiler/testData/ir/irText/types/nullChecks")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)

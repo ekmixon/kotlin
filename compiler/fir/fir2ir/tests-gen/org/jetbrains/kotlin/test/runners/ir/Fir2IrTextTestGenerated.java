@@ -2776,6 +2776,12 @@ public class Fir2IrTextTestGenerated extends AbstractFir2IrTextTest {
             runTest("compiler/testData/ir/irText/types/typeAliasWithUnsafeVariance.kt");
         }
 
+        @Test
+        @TestMetadata("unionTypes.kt")
+        public void testUnionTypes() throws Exception {
+            runTest("compiler/testData/ir/irText/types/unionTypes.kt");
+        }
+
         @Nested
         @TestMetadata("compiler/testData/ir/irText/types/nullChecks")
         @TestDataPath("$PROJECT_ROOT")
