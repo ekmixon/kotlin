@@ -6,8 +6,8 @@ plugins {
 project.updateJvmTarget("1.8")
 
 val allTestsRuntime by configurations.creating
-val testCompile by configurations
-testCompile.extendsFrom(allTestsRuntime)
+val testApi by configurations
+testApi.extendsFrom(allTestsRuntime)
 val embeddableTestRuntime by configurations.creating {
     extendsFrom(allTestsRuntime)
     attributes {
@@ -18,12 +18,12 @@ val embeddableTestRuntime by configurations.creating {
 
 dependencies {
     allTestsRuntime(commonDep("junit"))
-    testCompile(kotlinStdlib("jdk8"))
-    testCompile(project(":kotlin-scripting-ide-services-unshaded"))
-    testCompile(project(":kotlin-scripting-compiler"))
-    testCompile(project(":kotlin-scripting-dependencies"))
-    testCompile(project(":kotlin-main-kts"))
-    testCompile(project(":compiler:cli"))
+    testApi(kotlinStdlib("jdk8"))
+    testApi(project(":kotlin-scripting-ide-services-unshaded"))
+    testApi(project(":kotlin-scripting-compiler"))
+    testApi(project(":kotlin-scripting-dependencies"))
+    testApi(project(":kotlin-main-kts"))
+    testApi(project(":compiler:cli"))
 
     testRuntimeOnly(project(":kotlin-compiler"))
     testRuntimeOnly(commonDep("org.jetbrains.intellij.deps", "trove4j"))

@@ -17,7 +17,8 @@ val localPackagesToRelocate =
 
 val proguardLibraryJars by configurations.creating {
     attributes {
-        attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage.JAVA_API))
+        attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage.JAVA_RUNTIME))
+        attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, objects.named(LibraryElements.JAR))
     }
 }
 
@@ -49,6 +50,7 @@ dependencies {
     proguardLibraryJars(kotlinStdlib())
     proguardLibraryJars(project(":kotlin-reflect"))
     proguardLibraryJars(project(":kotlin-compiler"))
+    proguardLibraryJars(project(":kotlin-script-runtime"))
 
     relocatedJarContents(embedded)
     relocatedJarContents(mainSourceSet.output)
