@@ -13,15 +13,16 @@ pill {
 val kotlinGradlePluginTest = project(":kotlin-gradle-plugin").sourceSets.named("test").map { it.output }
 
 dependencies {
-    testImplementation(project(":kotlin-gradle-plugin"))
+    testImplementation(projectRuntimeJar(":kotlin-gradle-plugin"))
+    testImplementation(project(":kotlin-gradle-plugin-model"))
     testImplementation(project(":kotlin-project-model"))
     testImplementation(project(":kotlin-tooling-metadata"))
     testImplementation(kotlinGradlePluginTest)
     testImplementation(project(":kotlin-gradle-subplugin-example"))
-    testImplementation(project(":kotlin-allopen"))
-    testImplementation(project(":kotlin-noarg"))
-    testImplementation(project(":kotlin-lombok"))
-    testImplementation(project(":kotlin-sam-with-receiver"))
+    testImplementation(projectRuntimeJar(":kotlin-allopen"))
+    testImplementation(projectRuntimeJar(":kotlin-noarg"))
+    testImplementation(projectRuntimeJar(":kotlin-lombok"))
+    testImplementation(projectRuntimeJar(":kotlin-sam-with-receiver"))
     testImplementation(project(":kotlin-test:kotlin-test-jvm"))
     testImplementation(project(":native:kotlin-native-utils"))
 
@@ -29,14 +30,14 @@ dependencies {
     testImplementation(intellijCoreDep()) { includeJars("jdom") }
     // testCompileOnly dependency on non-shaded artifacts is needed for IDE support
     // testRuntimeOnly on shaded artifact is needed for running tests with shaded compiler
-    testCompileOnly(project(path = ":kotlin-gradle-plugin-test-utils-embeddable", configuration = "compile"))
+    testCompileOnly(project(":kotlin-gradle-plugin-test-utils-embeddable"))
     testRuntimeOnly(projectRuntimeJar(":kotlin-gradle-plugin-test-utils-embeddable"))
 
     testImplementation(project(path = ":examples:annotation-processor-example"))
     testImplementation(kotlinStdlib("jdk8"))
     testImplementation(project(":kotlin-reflect"))
     testImplementation(project(":kotlin-android-extensions"))
-    testImplementation(project(":kotlin-parcelize-compiler"))
+    testImplementation(projectRuntimeJar(":kotlin-parcelize-compiler"))
     testImplementation(commonDep("org.jetbrains.intellij.deps", "trove4j"))
 
     testImplementation(gradleApi())

@@ -16,8 +16,6 @@ configure<GradlePluginDevelopmentExtension> {
     isAutomatedPublishing = false
 }
 
-val jarContents by configurations.creating
-
 repositories {
     google()
     maven("https://plugins.gradle.org/m2/")
@@ -73,7 +71,7 @@ dependencies {
     runtimeOnly(projectRuntimeJar(":kotlin-scripting-compiler-embeddable"))
     runtimeOnly(projectRuntimeJar(":kotlin-scripting-compiler-impl-embeddable"))
 
-    jarContents(compileOnly(intellijDep()) {
+    embedded(compileOnly(intellijDep()) {
         includeJars("asm-all", "gson", "guava", "serviceMessages", rootProject = rootProject)
     })
 
@@ -89,7 +87,7 @@ dependencies {
 
     testCompileOnly(project(":compiler"))
     testImplementation(projectTests(":kotlin-build-common"))
-    testImplementation(project(":kotlin-android-extensions"))
+    testImplementation(projectRuntimeJar(":kotlin-android-extensions"))
     testImplementation(project(":kotlin-compiler-runner"))
     testImplementation(project(":kotlin-test::kotlin-test-junit"))
     testImplementation("junit:junit:4.12")
@@ -104,16 +102,7 @@ if (kotlinBuildProperties.isInJpsBuildIdeaSync) {
 }
 
 noDefaultJar()
-runtimeJar(rewriteDefaultJarDepsToShadedCompiler()).configure {
-    dependsOn(jarContents)
-
-    from {
-        jarContents.asFileTree.map {
-            if (it.endsWith(".jar")) zipTree(it)
-            else it
-        }
-    }
-}
+runtimeJar(rewriteDefaultJarDepsToShadedCompiler())
 
 tasks {
     named<ProcessResources>("processResources") {

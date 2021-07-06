@@ -6,13 +6,13 @@ plugins {
 }
 
 dependencies {
-    testApi(project(":kotlin-main-kts"))
+    testApi(project(":kotlin-main-kts", configuration = "runtimeJar"))
     testCompileOnly(project(":compiler:cli"))
     testCompileOnly(project(":kotlin-scripting-jvm-host-unshaded"))
     testApi(kotlinStdlib("jdk8"))
     testApi(commonDep("junit"))
     testApi(projectTests(":kotlin-scripting-compiler")) { isTransitive = false }
-    testImplementation(project(":kotlin-compiler-embeddable"))
+    testImplementation(projectRuntimeJar(":kotlin-compiler-embeddable"))
 }
 
 sourceSets {

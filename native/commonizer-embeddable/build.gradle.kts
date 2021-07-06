@@ -7,7 +7,7 @@ plugins {
 dependencies {
     embedded(project(":native:kotlin-klib-commonizer")) { isTransitive = false }
     runtimeOnly(kotlinStdlib())
-    runtimeOnly(project(":kotlin-compiler-embeddable"))
+    runtimeOnly(projectRuntimeJar(":kotlin-compiler-embeddable"))
 }
 
 sourceSets {

@@ -57,12 +57,12 @@ sourceSets {
         }
     }
 
-    test {
-        kotlin {
-            srcDir jsTestSrcDir
-            srcDir jsCommonTestSrcDir
-        }
-    }
+//    test {
+//        kotlin {
+//            srcDir jsTestSrcDir
+//            srcDir jsCommonTestSrcDir
+//        }
+//    }
 }
 
 dependencies {

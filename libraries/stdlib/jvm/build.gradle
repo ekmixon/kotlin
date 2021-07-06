@@ -23,11 +23,11 @@ sourceSets {
             srcDir 'src'
         }
     }
-    test {
-        kotlin {
-            srcDir 'test'
-        }
-    }
+//    test {
+//        kotlin {
+//            srcDir 'test'
+//        }
+//    }
     longRunningTest {
         kotlin {
             srcDir 'testLongRunning'

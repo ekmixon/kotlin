@@ -17,22 +17,22 @@ repositories {
 
 dependencies {
     compileOnly(project(":kotlinx-metadata"))
-    compileOnly(project(":kotlinx-metadata-jvm"))
+    compileOnly(project(":kotlinx-metadata-jvm", "runtimeJar"))
     implementation("org.jetbrains.intellij.deps:asm-all:$kotlinpAsmVersion")
 
     testCompileOnly(project(":kotlinx-metadata"))
-    testCompileOnly(project(":kotlinx-metadata-jvm"))
+    testCompileOnly(project(":kotlinx-metadata-jvm", "runtimeJar"))
     testImplementation(commonDep("junit:junit"))
     testImplementation(projectTests(":compiler:tests-common"))
     testImplementation(projectTests(":generators:test-generator"))
 
-    testRuntimeOnly(project(":kotlinx-metadata-jvm"/*, configuration = "runtime"*/))
+    testRuntimeOnly(project(":kotlinx-metadata-jvm", configuration = "runtimeJar"))
 
     testRuntimeOnly(intellijCoreDep()) { includeJars("intellij-core") }
 
     testRuntimeOnly(intellijDep()) { includeJars("platform-concurrency", "platform-objectSerializer") }
 
-    shadows(project(":kotlinx-metadata-jvm", configuration = "runtimeElements"))
+    shadows(project(":kotlinx-metadata-jvm", configuration = "runtimeJar"))
     shadows("org.jetbrains.intellij.deps:asm-all:$kotlinpAsmVersion")
 }
 

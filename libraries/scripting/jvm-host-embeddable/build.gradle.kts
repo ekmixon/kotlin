@@ -10,8 +10,8 @@ dependencies {
     runtimeOnly(kotlinStdlib())
     runtimeOnly(project(":kotlin-scripting-common"))
     runtimeOnly(project(":kotlin-scripting-jvm"))
-    runtimeOnly(project(":kotlin-compiler-embeddable"))
-    runtimeOnly(project(":kotlin-scripting-compiler-embeddable"))
+    runtimeOnly(projectRuntimeJar(":kotlin-compiler-embeddable"))
+    runtimeOnly(projectRuntimeJar(":kotlin-scripting-compiler-embeddable"))
 }
 
 sourceSets {

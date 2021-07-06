@@ -17,12 +17,12 @@ sourceSets {
             srcDir '../unsigned/src'
         }
     }
-    test {
-        kotlin {
-            srcDir commonTestSrcDir
-            srcDir 'test'
-        }
-    }
+//    test {
+//        kotlin {
+//            srcDir commonTestSrcDir
+//            srcDir 'test'
+//        }
+//    }
 }
 
 dependencies {

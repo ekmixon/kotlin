@@ -18,17 +18,17 @@ sourceSets {
             srcDir 'src'
         }
     }
-    test {
-        kotlin {
-            srcDir 'test'
-            if(!BuildPropertiesKt.getKotlinBuildProperties(project).inIdeaSync) {
-                srcDir '../jvm/test'
-                srcDir '../common/test'
-                srcDir '../test'
-                srcDir '../jdk7/test'
-            }
-        }
-    }
+//    test {
+//        kotlin {
+//            srcDir 'test'
+//            if(!BuildPropertiesKt.getKotlinBuildProperties(project).inIdeaSync) {
+//                srcDir '../jvm/test'
+//                srcDir '../common/test'
+//                srcDir '../test'
+//                srcDir '../jdk7/test'
+//            }
+//        }
+//    }
     java9 {
         java {
             srcDir 'java9'
@@ -72,7 +72,7 @@ compileTestKotlin {
             "-Xopt-in=kotlin.ExperimentalUnsignedTypes",
             "-Xopt-in=kotlin.ExperimentalStdlibApi",
             "-Xopt-in=kotlin.io.path.ExperimentalPathApi",
-            "-Xcommon-sources=${fileTree('../test').join(',')}",
+//            "-Xcommon-sources=${fileTree('../test').join(',')}",
     ]
 }
 

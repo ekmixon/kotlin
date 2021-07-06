@@ -16,16 +16,16 @@ sourceSets {
             srcDir 'src'
         }
     }
-    test {
-        kotlin {
-            srcDir 'test'
-            if(!BuildPropertiesKt.getKotlinBuildProperties(project).inIdeaSync) {
-                srcDir '../jvm/test'
-                srcDir '../common/test'
-                srcDir '../test'
-            }
-        }
-    }
+//    test {
+//        kotlin {
+//            srcDir 'test'
+//            if(!BuildPropertiesKt.getKotlinBuildProperties(project).inIdeaSync) {
+//                srcDir '../jvm/test'
+//                srcDir '../common/test'
+//                srcDir '../test'
+//            }
+//        }
+//    }
     noJdk7Test {
         kotlin {
             srcDir 'testNoJdk7'
@@ -87,7 +87,7 @@ compileTestKotlin {
             "-Xopt-in=kotlin.ExperimentalUnsignedTypes",
             "-Xopt-in=kotlin.ExperimentalStdlibApi",
             "-Xopt-in=kotlin.io.path.ExperimentalPathApi",
-            "-Xcommon-sources=${fileTree('../test').join(',')}",
+//            "-Xcommon-sources=${fileTree('../test').join(',')}",
             "-Xsuppress-deprecated-jvm-target-warning",
     ]
 }
