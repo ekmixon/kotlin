@@ -124,7 +124,7 @@ if (project.globalTestArgs.contains("-g")) {
     }
 
     tasks.withType(RunExternalTestGroup.class).configureEach {
-        extraOpts "-Xruntime-asserts-mode=panic"
+        flags = (flags ?: []) + "-Xruntime-asserts-mode=panic"
     }
 }
 
