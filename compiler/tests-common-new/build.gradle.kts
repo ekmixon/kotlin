@@ -61,6 +61,13 @@ projectTest(jUnit5Enabled = true) {
     maxHeapSize = "3g"
 
     useJUnitPlatform()
+
+    doFirst {
+        systemProperty(
+            "JDK_17_0",
+            project.getToolchainLauncherFor(JdkMajorVersion.JDK_17).get().metadata.installationPath.asFile.absolutePath
+        )
+    }
 }
 
 testsJar()

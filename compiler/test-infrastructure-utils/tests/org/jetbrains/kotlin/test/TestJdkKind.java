@@ -28,6 +28,8 @@ public enum TestJdkKind {
     FULL_JDK_9,
     // JDK found at $JDK_15
     FULL_JDK_15,
+    // JDK found at $JDK_15
+    FULL_JDK_17,
     // JDK found at java.home
     FULL_JDK,
     ANDROID_API,
