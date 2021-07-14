@@ -64,6 +64,16 @@ projectTest(jUnit5Enabled = true) {
 
     doFirst {
         systemProperty(
+            "JDK_9",
+            project.getToolchainLauncherFor(JdkMajorVersion.JDK_9).get().metadata.installationPath.asFile.absolutePath
+        )
+
+        systemProperty(
+            "JDK_15_0",
+            project.getToolchainLauncherFor(JdkMajorVersion.JDK_15).get().metadata.installationPath.asFile.absolutePath
+        )
+
+        systemProperty(
             "JDK_17_0",
             project.getToolchainLauncherFor(JdkMajorVersion.JDK_17).get().metadata.installationPath.asFile.absolutePath
         )
