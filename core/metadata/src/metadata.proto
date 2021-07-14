@@ -159,6 +159,10 @@ message Type {
   optional Type abbreviated_type = 13;
   optional int32 abbreviated_type_id = 14 [(type_id_in_table) = true];
 
+  // Required only for union type
+  repeated Type nested_type = 15;
+  repeated int32 nested_type_id = 16 [packed = true, (type_id_in_table) = true];
+
   /*
     suspend
    */
