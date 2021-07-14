@@ -11,6 +11,7 @@ import org.jetbrains.kotlin.test.TargetBackend;
 import org.jetbrains.kotlin.test.TestMetadata;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Tag;
 
 import java.io.File;
 import java.util.regex.Pattern;
@@ -41494,6 +41495,7 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     }
 
     @Nested
+    @Tag("<modernJava>")
     @TestMetadata("compiler/testData/codegen/box/testsWithJava15")
     @TestDataPath("$PROJECT_ROOT")
     public class TestsWithJava15 {
@@ -41574,6 +41576,7 @@ public class FirBlackBoxCodegenTestGenerated extends AbstractFirBlackBoxCodegenT
     }
 
     @Nested
+    @Tag("<modernJava>")
     @TestMetadata("compiler/testData/codegen/box/testsWithJava9")
     @TestDataPath("$PROJECT_ROOT")
     public class TestsWithJava9 {
