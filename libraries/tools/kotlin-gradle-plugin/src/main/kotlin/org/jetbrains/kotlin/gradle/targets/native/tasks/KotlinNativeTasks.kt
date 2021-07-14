@@ -462,7 +462,7 @@ constructor(
             add("-XXLanguage:+$featureName")
         }
         optInAnnotationsInUse.forEach { annotationName ->
-            add("-Xopt-in=$annotationName")
+            add("-opt-in=$annotationName")
         }
     }
 
@@ -627,7 +627,7 @@ constructor(
                 add("-XXLanguage:+$featureName")
             }
             it.optInAnnotationsInUse.forEach { annotationName ->
-                add("-Xopt-in=$annotationName")
+                add("-opt-in=$annotationName")
             }
         }
     }
