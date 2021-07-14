@@ -42015,6 +42015,30 @@ public class BlackBoxCodegenTestGenerated extends AbstractBlackBoxCodegenTest {
         public void testAllFilesPresentInUnionTypes() throws Exception {
             KtTestUtil.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/unionTypes"), Pattern.compile("^(.+)\\.kt$"), null, TargetBackend.JVM, true);
         }
+
+        @Test
+        @TestMetadata("applicability.kt")
+        public void testApplicability() throws Exception {
+            runTest("compiler/testData/codegen/box/unionTypes/applicability.kt");
+        }
+
+        @Test
+        @TestMetadata("callResolution.kt")
+        public void testCallResolution() throws Exception {
+            runTest("compiler/testData/codegen/box/unionTypes/callResolution.kt");
+        }
+
+        @Test
+        @TestMetadata("mayBe.kt")
+        public void testMayBe() throws Exception {
+            runTest("compiler/testData/codegen/box/unionTypes/mayBe.kt");
+        }
+
+        @Test
+        @TestMetadata("typeParameter.kt")
+        public void testTypeParameter() throws Exception {
+            runTest("compiler/testData/codegen/box/unionTypes/typeParameter.kt");
+        }
     }
 
     @Nested

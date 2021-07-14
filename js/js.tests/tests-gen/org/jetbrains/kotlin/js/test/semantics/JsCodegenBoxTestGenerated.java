@@ -27531,6 +27531,26 @@ public class JsCodegenBoxTestGenerated extends AbstractJsCodegenBoxTest {
         public void testAllFilesPresentInUnionTypes() throws Exception {
             KtTestUtil.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/unionTypes"), Pattern.compile("^(.+)\\.kt$"), null, TargetBackend.JS, true);
         }
+
+        @TestMetadata("applicability.kt")
+        public void testApplicability() throws Exception {
+            runTest("compiler/testData/codegen/box/unionTypes/applicability.kt");
+        }
+
+        @TestMetadata("callResolution.kt")
+        public void testCallResolution() throws Exception {
+            runTest("compiler/testData/codegen/box/unionTypes/callResolution.kt");
+        }
+
+        @TestMetadata("mayBe.kt")
+        public void testMayBe() throws Exception {
+            runTest("compiler/testData/codegen/box/unionTypes/mayBe.kt");
+        }
+
+        @TestMetadata("typeParameter.kt")
+        public void testTypeParameter() throws Exception {
+            runTest("compiler/testData/codegen/box/unionTypes/typeParameter.kt");
+        }
     }
 
     @TestMetadata("compiler/testData/codegen/box/unit")

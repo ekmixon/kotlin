@@ -33818,6 +33818,26 @@ public class LightAnalysisModeTestGenerated extends AbstractLightAnalysisModeTes
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
     public static class UnionTypes extends AbstractLightAnalysisModeTest {
+        @TestMetadata("applicability.kt")
+        public void ignoreApplicability() throws Exception {
+            runTest("compiler/testData/codegen/box/unionTypes/applicability.kt");
+        }
+
+        @TestMetadata("callResolution.kt")
+        public void ignoreCallResolution() throws Exception {
+            runTest("compiler/testData/codegen/box/unionTypes/callResolution.kt");
+        }
+
+        @TestMetadata("mayBe.kt")
+        public void ignoreMayBe() throws Exception {
+            runTest("compiler/testData/codegen/box/unionTypes/mayBe.kt");
+        }
+
+        @TestMetadata("typeParameter.kt")
+        public void ignoreTypeParameter() throws Exception {
+            runTest("compiler/testData/codegen/box/unionTypes/typeParameter.kt");
+        }
+
         private void runTest(String testDataFilePath) throws Exception {
             KotlinTestUtils.runTest(this::doTest, TargetBackend.JVM, testDataFilePath);
         }
