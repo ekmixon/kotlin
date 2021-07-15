@@ -55,11 +55,11 @@ abstract class AbstractJvmBlackBoxCodegenTestBase<R : ResultingArtifact.Frontend
             }
         }
 
-        forTestsMatching("compiler/testData/codegen/box/testsWithJava9/*") {
+        forTestsMatching("compiler/testData/codegen/boxModernJdk/testsWithJava9/*") {
             configureModernJavaTest(TestJdkKind.FULL_JDK_9)
         }
 
-        forTestsMatching("compiler/testData/codegen/box/testsWithJava15/*") {
+        forTestsMatching("compiler/testData/codegen/boxModernJdk/testsWithJava15/*") {
             configureModernJavaTest(TestJdkKind.FULL_JDK_15)
         }
 
