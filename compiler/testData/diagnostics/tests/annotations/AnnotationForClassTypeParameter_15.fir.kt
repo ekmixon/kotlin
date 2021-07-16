@@ -1,5 +1,8 @@
 // !LANGUAGE: -ClassTypeParameterAnnotations
+@Target(AnnotationTarget.TYPE)
 annotation class A1
+
+@Target(AnnotationTarget.TYPE)
 annotation class A2(val some: Int = 12)
 
 class TopLevelClass<<!WRONG_ANNOTATION_TARGET!>@A1<!> <!WRONG_ANNOTATION_TARGET!>@A2(3)<!> <!WRONG_ANNOTATION_TARGET!>@A2<!> <!WRONG_ANNOTATION_TARGET!>@A1(<!TOO_MANY_ARGUMENTS!>12<!>)<!> <!WRONG_ANNOTATION_TARGET!>@A2(<!ARGUMENT_TYPE_MISMATCH!>"Test"<!>)<!> T> {

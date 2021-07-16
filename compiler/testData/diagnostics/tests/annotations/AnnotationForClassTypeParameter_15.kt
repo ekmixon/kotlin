@@ -1,5 +1,8 @@
 // !LANGUAGE: -ClassTypeParameterAnnotations
+@Target(AnnotationTarget.TYPE_PARAMETER)
 annotation class A1
+
+@Target(AnnotationTarget.TYPE_PARAMETER)
 annotation class A2(val some: Int = 12)
 
 class TopLevelClass<<!UNSUPPORTED!>@A1<!> <!UNSUPPORTED!>@A2(3)<!> <!UNSUPPORTED!>@A2<!> <!UNSUPPORTED!>@A1(12)<!> <!UNSUPPORTED!>@A2("Test")<!> T> {
