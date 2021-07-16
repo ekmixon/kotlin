@@ -48,13 +48,13 @@ class KtFirOverrideInfoProvider(
     override fun getImplementationStatus(memberSymbol: KtCallableSymbol, parentClassSymbol: KtClassOrObjectSymbol): ImplementationStatus? {
         require(memberSymbol is KtFirSymbol<*>)
         require(parentClassSymbol is KtFirSymbol<*>)
-        return memberSymbol.firRef.withFir(FirResolvePhase.STATUS) { memberFir ->
-            if (memberFir !is FirCallableDeclaration) return@withFir null
-            parentClassSymbol.firRef.withFir inner@{ parentClassFir ->
-                if (parentClassSymbol !is FirClassSymbol<*>) return@inner null
+        return memberSymbol.firRef.withFirWithPossibleResolveInside(FirResolvePhase.STATUS) { memberFir ->
+            if (memberFir !is FirCallableDeclaration) return@withFirWithPossibleResolveInside null
+            parentClassSymbol.firRef.withFirWithPossibleResolveInside(FirResolvePhase.RAW_FIR) inner@{ parentClassFir ->
+                val parentClassFirSymbol = parentClassFir.symbol as? FirClassSymbol<*> ?: return@inner null
                 memberFir.symbol.getImplementationStatus(
                     SessionHolderImpl(firAnalysisSession.rootModuleSession, ScopeSession()),
-                    parentClassSymbol
+                    parentClassFirSymbol
                 )
             }
         }
