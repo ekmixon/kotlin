@@ -6,11 +6,13 @@
 package org.jetbrains.kotlin.gradle.targets.native.internal
 
 import org.gradle.api.DefaultTask
+import org.gradle.api.Project
 import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskProvider
 import org.jetbrains.kotlin.commonizer.CommonizerOutputFileLayout
 import org.jetbrains.kotlin.commonizer.CommonizerOutputFileLayout.fileName
+import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinSharedNativeCompilation
 import org.jetbrains.kotlin.gradle.utils.filesProvider
 import java.io.File
@@ -25,21 +27,20 @@ internal abstract class AbstractCInteropCommonizerTask : DefaultTask() {
             .resolve(parameters.interops.map { it.interopName }.distinct().joinToString("-"))
     }
 
-    internal abstract fun getCommonizationParameters(compilation: KotlinSharedNativeCompilation): CInteropCommonizationParameters?
+    internal abstract fun findCommonizationParameters(sharedInterops: SharedInterops): CInteropCommonizationParameters?
 
-    internal fun getLibraries(compilation: KotlinSharedNativeCompilation): FileCollection {
-        val compilationCommonizerTarget = project.getCommonizerTarget(compilation) ?: return project.files()
+    internal fun findCommonizationParameters(compilation: KotlinSharedNativeCompilation): CInteropCommonizationParameters? {
+        return findCommonizationParameters(findSharedInterops(compilation) ?: return null)
+    }
+
+    internal fun commonizedOutputLibraries(sharedInterops: SharedInterops): FileCollection {
         val fileProvider = project.filesProvider {
-            val parameters = getCommonizationParameters(compilation) ?: return@filesProvider emptySet<File>()
+            val parameters = findCommonizationParameters(sharedInterops) ?: return@filesProvider emptySet<File>()
             CommonizerOutputFileLayout
-                .resolveCommonizedDirectory(outputDirectory(parameters), compilationCommonizerTarget)
+                .resolveCommonizedDirectory(outputDirectory(parameters), sharedInterops.target)
                 .listFiles().orEmpty().toSet()
         }
 
         return fileProvider.builtBy(this)
     }
-}
-
-internal fun TaskProvider<out AbstractCInteropCommonizerTask>.getLibraries(compilation: KotlinSharedNativeCompilation): FileCollection {
-    return compilation.target.project.files(map { it.getLibraries(compilation) })
 }

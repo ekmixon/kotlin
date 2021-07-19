@@ -7,7 +7,6 @@ package org.jetbrains.kotlin.gradle.targets.native.internal
 
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.*
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinSharedNativeCompilation
 import java.io.File
 
 internal open class CopyCommonizeCInteropForIdeTask : AbstractCInteropCommonizerTask() {
@@ -25,14 +24,14 @@ internal open class CopyCommonizeCInteropForIdeTask : AbstractCInteropCommonizer
     override val outputDirectory: File = project.rootDir.resolve(".gradle/kotlin/commonizer")
         .resolve(project.path.removePrefix(":").replace(":", "/"))
 
-    override fun getCommonizationParameters(compilation: KotlinSharedNativeCompilation): CInteropCommonizationParameters? {
-        return commonizeCInteropTask.get().getCommonizationParameters(compilation)
+    override fun findCommonizationParameters(sharedInterops: SharedInterops): CInteropCommonizationParameters? {
+        return commonizeCInteropTask.get().findCommonizationParameters(sharedInterops)
     }
 
     @TaskAction
     protected fun copy() {
         outputDirectory.mkdirs()
-        for (parameters in commonizeCInteropTask.get().getCommonizationParameters()) {
+        for (parameters in commonizeCInteropTask.get().getAllCommonizationParameters()) {
             val source = commonizeCInteropTask.get().outputDirectory(parameters)
             if (!source.exists()) continue
             val target = outputDirectory(parameters)
