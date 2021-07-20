@@ -5,14 +5,12 @@
 
 package org.jetbrains.kotlin.idea.fir.low.level.api.test.base
 
+import com.intellij.DynamicBundle
+import com.intellij.core.CoreApplicationEnvironment
+import com.intellij.mock.MockApplication
 import com.intellij.mock.MockProject
-import com.intellij.openapi.project.Project
-import com.intellij.psi.PsiElementFinder
-import org.jetbrains.kotlin.asJava.KotlinAsJavaSupport
-import org.jetbrains.kotlin.asJava.finder.JavaElementFinder
-import org.jetbrains.kotlin.fir.session.FirModuleInfoBasedModuleData
-import org.jetbrains.kotlin.idea.fir.low.level.api.compiler.based.FirModuleResolveStateConfiguratorForSingleModuleTestImpl
-import org.jetbrains.kotlin.idea.fir.low.level.api.compiler.based.registerTestServices
+import com.intellij.openapi.application.ApplicationManager
+import com.intellij.psi.impl.source.tree.TreeCopyHandler
 import org.jetbrains.kotlin.idea.fir.low.level.api.compiler.based.*
 import org.jetbrains.kotlin.platform.jvm.JvmPlatforms
 import org.jetbrains.kotlin.psi.KtFile
@@ -95,10 +93,27 @@ abstract class AbstractLowLevelApiTest : TestWithDisposable() {
             registerServicesForProject(this)
         }
 
-        doTestByFileStructure(moduleInfo.ktFiles.toList(), moduleStructure, testServices)
+        registerApplicationServices()
+
+        doTestByFileStructure(
+            moduleInfo.testFilesToKtFiles.filter { (testFile, _) -> !testFile.isAdditional }.values.toList(),
+            moduleStructure,
+            testServices
+        )
+    }
+
+    private fun registerApplicationServices() {
+        val application = ApplicationManager.getApplication() as MockApplication
+        synchronized(application) {
+            registerApplicationServices(application)
+        }
     }
 
     protected open fun registerServicesForProject(project: MockProject) {}
+
+    protected open fun registerApplicationServices(application: MockApplication) {
+        CoreApplicationEnvironment.registerApplicationExtensionPoint(TreeCopyHandler.EP_NAME, TreeCopyHandler::class.java)
+    }
 
     protected abstract fun doTestByFileStructure(ktFiles: List<KtFile>, moduleStructure: TestModuleStructure, testServices: TestServices)
 

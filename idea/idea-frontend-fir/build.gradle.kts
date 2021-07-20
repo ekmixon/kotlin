@@ -76,6 +76,12 @@ dependencies {
     generatorClasspath(project(":idea-frontend-fir:idea-frontend-fir-generator"))
 }
 
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(11))
+    }
+}
+
 val generateCode by tasks.registering(NoDebugJavaExec::class) {
     val generatorRoot = "$projectDir/idea/idea-frontend-fir/idea-frontend-fir-generator/src/"
 

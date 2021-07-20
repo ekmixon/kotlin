@@ -20,4 +20,12 @@ dependencies {
     testApiJUnit5()
 }
 
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(11))
+    }
+}
+
+
 val generateFrontendApiTests by generator("org.jetbrains.kotlin.generators.tests.frontend.api.GenerateTestsKt")
