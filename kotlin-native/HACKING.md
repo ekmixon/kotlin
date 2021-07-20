@@ -48,13 +48,13 @@ There are several gradle flags one can use for Konan build.
 
 * **-Pbuild_flags** passes flags to the compiler used to build stdlib
 
-        ./gradlew -Pbuild_flags="--disable lower_inline --print_ir" kotlin-native:stdlib
+        ./gradlew -Pbuild_flags="--disable lower_inline --print_ir" :kotlin-native:stdlib
 
 * **-Pshims** compiles LLVM interface with tracing "shims". Allowing one 
     to trace the LLVM calls from the compiler.
     Make sure to rebuild the project.
 
-        ./gradlew -Pshims=true kotlin-native:dist
+        ./gradlew -Pshims=true :kotlin-native:dist
 
  ## Compiler environment variables
 
@@ -66,27 +66,27 @@ There are several gradle flags one can use for Konan build.
 
 To run blackbox compiler tests from JVM Kotlin use (takes time):
 
-    ./gradlew kotlin-native:run_external
+    ./gradlew :kotlin-native:run_external
 
 * **-Pfilter** allows one to choose test files to run.
 
-        ./gradlew -Pfilter=overflowLong.kt kotlin-native:run_external
+        ./gradlew -Pfilter=overflowLong.kt :kotlin-native:run_external
 
 * **-Pprefix** allows one to choose external test directories to run. Only tests from directories with given prefix will be executed.
 
-        ./gradlew -Pprefix=build_external_compiler_codegen_box_cast kotlin-native:run_external
+        ./gradlew -Pprefix=build_external_compiler_codegen_box_cast :kotlin-native:run_external
 
 * **-Ptest_flags** passes flags to the compiler used to compile tests
 
-        ./gradlew -Ptest_flags="--time" kotlin-native:backend.native:tests:array0
+        ./gradlew -Ptest_flags="--time" :kotlin-native:backend.native:tests:array0
 
 * **-Ptest_target** specifies cross target for a test run. 
 
-        ./gradlew -Ptest_target=raspberrypi kotlin-native:backend.native:tests:array0
+        ./gradlew -Ptest_target=raspberrypi :kotlin-native:backend.native:tests:array0
 
 * **-Premote=user@host** sets remote test execution login/hostname. Good for cross compiled tests.
 
-        ./gradlew -Premote=kotlin@111.22.33.444 kotlin-native:backend.native:tests:run
+        ./gradlew -Premote=kotlin@111.22.33.444 :kotlin-native:backend.native:tests:run
 
 * **-Ptest_verbose** enables printing compiler args and other helpful information during a test execution.
 
@@ -95,7 +95,7 @@ To run blackbox compiler tests from JVM Kotlin use (takes time):
 * **-Ptest_two_stage** enables two-stage compilation of tests. If two-stage compilation is enabled, test sources are compiled into a klibrary
 and then a final native binary is produced from this klibrary using the -Xinclude compiler flag.
 
-        ./gradlew -Ptest_two_stage kotlin-native:backend.native:tests:array0
+        ./gradlew -Ptest_two_stage :kotlin-native:backend.native:tests:array0
         
 * **-Ptest_with_cache_kind=static|dynamic** enables using caches during testing. 
        
@@ -103,9 +103,9 @@ and then a final native binary is produced from this klibrary using the -Xinclud
  
 To run runtime unit tests on the host machine for both mimalloc and the standard allocator:
 
-    ./gradlew kotlin-native:hostRuntimeTests
+    ./gradlew :kotlin-native:hostRuntimeTests
        
-To run tests for only one of these two allocators, run `kotlin-native:hostStdAllocRuntimeTests` or `kotlin-native:hostMimallocRuntimeTests`.
+To run tests for only one of these two allocators, run `:kotlin-native:hostStdAllocRuntimeTests` or `:kotlin-native:hostMimallocRuntimeTests`.
 
 We use [Google Test](https://github.com/google/googletest) to execute the runtime unit tests. The build automatically fetches
 the specified Google Test revision to `kotlin-native/runtime/googletest`. It is possible to manually modify the downloaded GTest sources for debug
@@ -113,11 +113,11 @@ purposes; the build will not overwrite them by default.
 
 To forcibly redownload Google Test when running tests, use the corresponding project property:
 
-     ./gradlew kotlin-native:hostRuntimeTests -Prefresh-gtest
+     ./gradlew :kotlin-native:hostRuntimeTests -Prefresh-gtest
 
 or run the `downloadGTest` task directly with the `--refresh` CLI key:
 
-    ./gradlew kotlin-native:downloadGTest --refresh
+    ./gradlew :kotlin-native:downloadGTest --refresh
     
 To use a local GTest copy instead of the downloaded one, add the following line to `kotlin-native/runtime/build.gradle.kts`:
 
@@ -125,7 +125,7 @@ To use a local GTest copy instead of the downloaded one, add the following line 
 
 ## Debugging Kotlin/Native compiler
 
-In order to debug Kotlin/Native compiler using IntelliJ IDEA, firstly, compiler should be run from command line in special way to wait debbuger connection.
+In order to debug Kotlin/Native compiler using IntelliJ IDEA, firstly compiler should be run from command line in special way to wait debbuger connection.
 Some JVM flags should be specified before compiler runs to do this. These flags could be set via environment variable `JAVA_OPTS`.
 So the next bash script (`debug.sh`) can be used to debug. 
 
@@ -158,7 +158,7 @@ It's possible to use CLion to develop C++ runtime code efficiently and to have n
 To open runtime code in CLion as project and use all provided features of CLion use a compilation database. 
 It lets CLion detect project files and extract all the necessary compiler information, such as include paths and compilation flags.
 To generate compilation database for kotlin/Native runtime run gradle task
-`./gradlew kotlin-native:compdb`.
+`./gradlew :kotlin-native:compdb`.
 This task generates `<path_to_kotlin>/kotlin-native/compile_commands.json` file that should be opened in CLion as project.
 Other developer tools also can use generated compilation database, but then `clangd` tool should be installed manually.
 
