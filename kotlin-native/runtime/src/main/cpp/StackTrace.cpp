@@ -153,15 +153,25 @@ KStdVector<KStdString> kotlin::GetStackTraceStrings(void* const* stackTrace, siz
                 if (sourceInfo.fileName != nullptr) {
                     const char* inline_tag = (frame == frames - 1) ? "" : "[inlined] ";
                     if (sourceInfo.lineNumber != -1) {
-                        konan::snprintf(
-                                line, sizeof(line) - 1, "%-4zd %s %s(%s:%d:%d)", strings.size(), symbol, inline_tag,
-                                sourceInfo.fileName, sourceInfo.lineNumber, buffer[frame].column);
+                        if (sourceInfo.column != -1) {
+                            konan::snprintf(
+                                     line, sizeof(line) - 1, "%-4zd %s %s(%s:%d:%d)", strings.size(), symbol, inline_tag,
+                                    sourceInfo.fileName, sourceInfo.lineNumber, buffer[frame].column);
+                        } else {
+                            konan::snprintf(
+                                    line, sizeof(line) - 1, "%-4zd %s %s(%s:%d)", strings.size(), symbol, inline_tag,
+                                    sourceInfo.fileName, sourceInfo.lineNumber);
+                        }
                     } else {
                         konan::snprintf(line, sizeof(line) - 1, "%-4zd %s %s(%s:<unknown>)", strings.size(), symbol, inline_tag,
                                         sourceInfo.fileName);
                     }
                     isSomethingPrinted = true;
                     strings.push_back(line);
+                    if (sourceInfo.needFreeFileName) {
+                        free(const_cast<char*>(sourceInfo.fileName));
+                        sourceInfo.fileName = nullptr;
+                    }
                 }
             }
             if (!isSomethingPrinted) {
