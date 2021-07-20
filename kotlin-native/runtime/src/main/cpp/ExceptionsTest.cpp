@@ -212,8 +212,11 @@ TEST(TerminationHandlerDeathTest, UnhandledKotlinExceptionInForeignThread) {
             loggingAssert(mm::GetMemoryState() == nullptr, "Expected unregistered thread before throwing");
 
             auto future = std::async(std::launch::async, []() {
-                // Initial Kotlin exception throwing requires the memory to be initialized.
-                ScopedMemoryInit init;
+                // Initial Kotlin exception throwing requires the runtime to be initialized.
+                // Do not use ScopedMemoryInit because it clears the stable ref queue
+                // of the current thread on deinitialization. After that the ExceptionObjHolder
+                // will contain a dangling pointer to the stable ref queue entry.
+                Kotlin_initRuntimeIfNeeded();
                 ObjHeader exception{};
                 ExceptionObjHolder::Throw(&exception);
             });
