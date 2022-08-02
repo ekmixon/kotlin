@@ -9,13 +9,13 @@ import kotlin_bridge
 session = kotlin_bridge.open_session(239, 'konan')
 
 message = kotlin_bridge.greet_server(session)
-print("Greet '{}'".format(message))
+print(f"Greet '{message}'")
 
 message = kotlin_bridge.concat_server(session, "Coding", "fun")
-print("Concat '{}'".format(message))
+print(f"Concat '{message}'")
 
 message = kotlin_bridge.add_server(session, 1, 60)
-print("Sum '{}'".format(message))
+print(f"Sum '{message}'")
 
 
 kotlin_bridge.close_session(session)

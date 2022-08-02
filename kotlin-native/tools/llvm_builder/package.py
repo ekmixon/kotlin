@@ -22,11 +22,7 @@ git = 'git'
 
 
 def absolute_path(path):
-    if path is not None:
-        # CMake is not tolerant to backslashes in path.
-        return os.path.abspath(path).replace('\\', '/')
-    else:
-        return None
+    return os.path.abspath(path).replace('\\', '/') if path is not None else None
 
 
 def host_is_windows():
@@ -50,10 +46,7 @@ def host_default_compression():
     Determine archive compression method based on current OS.
     On Windows we use `zip` and `tar.gz` otherwise.
     """
-    if host_is_windows():
-        return "zip"
-    else:
-        return "gztar"
+    return "zip" if host_is_windows() else "gztar"
 
 
 def detect_xcode_sdk_path():
@@ -75,15 +68,15 @@ def detect_vsdevcmd():
         vswhere_url = "https://github.com/microsoft/vswhere/releases/download/2.8.4/vswhere.exe"
         urllib.request.urlretrieve(vswhere_url, 'vswhere.exe')
         vswhere = shutil.which('vswhere')
-        if vswhere is None:
-            sys.exit("Failed to retrieve vswhere utility. Please provide path to vsdevcmd.bat with --vsdevcmd")
+    if vswhere is None:
+        sys.exit("Failed to retrieve vswhere utility. Please provide path to vsdevcmd.bat with --vsdevcmd")
     vswhere_args = [vswhere, '-prerelease', '-latest', '-property', 'installationPath']
     path_to_visual_studio = subprocess.check_output(vswhere_args, universal_newlines=True).rstrip()
     vsdevcmd_path = os.path.join(path_to_visual_studio, "Common7", "Tools", "vsdevcmd.bat")
     if not os.path.isfile(vsdevcmd_path):
         sys.exit("vsdevcmd.bat is not found. Please provide path to vsdevcmd.bat with --vsdevcmd")
     else:
-        print("Found vsdevcmd.bat: " + vsdevcmd_path)
+        print(f"Found vsdevcmd.bat: {vsdevcmd_path}")
     return vsdevcmd_path
 
 
@@ -115,10 +108,14 @@ def construct_cmake_flags(
     ]
     if not building_bootstrap:
         if distribution_components:
-            cmake_args.append('-DLLVM_DISTRIBUTION_COMPONENTS=' + ';'.join(distribution_components))
-            # These links are actually copies on windows, so they're wasting precious disk space.
-            cmake_args.append("-DCLANG_LINKS_TO_CREATE=clang++")
-            cmake_args.append("-DLLD_SYMLINKS_TO_CREATE=ld.lld;wasm-ld")
+            cmake_args.extend(
+                (
+                    '-DLLVM_DISTRIBUTION_COMPONENTS='
+                    + ';'.join(distribution_components),
+                    "-DCLANG_LINKS_TO_CREATE=clang++",
+                    "-DLLD_SYMLINKS_TO_CREATE=ld.lld;wasm-ld",
+                )
+            )
 
         if host_is_windows():
             # CMake is not tolerant to backslashes
@@ -158,7 +155,7 @@ def construct_cmake_flags(
             cmake_args.append('-DLIBCXX_USE_COMPILER_RT=ON')
 
     if install_path is not None:
-        cmake_args.append('-DCMAKE_INSTALL_PREFIX=' + install_path)
+        cmake_args.append(f'-DCMAKE_INSTALL_PREFIX={install_path}')
     if targets is not None:
         cmake_args.append('-DLLVM_TARGETS_TO_BUILD=' + ";".join(targets))
     if projects is not None:
@@ -166,30 +163,35 @@ def construct_cmake_flags(
     if runtimes is not None:
         cmake_args.append('-DLLVM_ENABLE_RUNTIMES=' + ";".join(runtimes))
     if c_compiler is not None:
-        cmake_args.append('-DCMAKE_C_COMPILER=' + c_compiler)
+        cmake_args.append(f'-DCMAKE_C_COMPILER={c_compiler}')
     if cxx_compiler is not None:
-        cmake_args.append('-DCMAKE_CXX_COMPILER=' + cxx_compiler)
+        cmake_args.append(f'-DCMAKE_CXX_COMPILER={cxx_compiler}')
     if linker is not None:
-        cmake_args.append('-DCMAKE_LINKER=' + linker)
+        cmake_args.append(f'-DCMAKE_LINKER={linker}')
     if ar is not None:
-        cmake_args.append('-DCMAKE_AR=' + ar)
+        cmake_args.append(f'-DCMAKE_AR={ar}')
 
     if c_flags is not None:
         cmake_args.append("-DCMAKE_C_FLAGS=" + ' '.join(c_flags))
     if cxx_flags is not None:
         cmake_args.append("-DCMAKE_CXX_FLAGS=" + ' '.join(cxx_flags))
     if linker_flags is not None:
-        cmake_args.append('-DCMAKE_EXE_LINKER_FLAGS=' + ' '.join(linker_flags))
-        cmake_args.append('-DCMAKE_MODULE_LINKER_FLAGS=' + ' '.join(linker_flags))
-        cmake_args.append('-DCMAKE_SHARED_LINKER_FLAGS=' + ' '.join(linker_flags))
+        cmake_args.extend(
+            (
+                '-DCMAKE_EXE_LINKER_FLAGS=' + ' '.join(linker_flags),
+                '-DCMAKE_MODULE_LINKER_FLAGS=' + ' '.join(linker_flags),
+                '-DCMAKE_SHARED_LINKER_FLAGS=' + ' '.join(linker_flags),
+            )
+        )
 
     if host_is_windows():
-        # Use MT to make distribution self-contained
-        # TODO: Consider -DCMAKE_INSTALL_UCRT_LIBRARIES=ON as an alternative
-        cmake_args.append('-DLLVM_USE_CRT_RELEASE=MT')
-        cmake_args.append('-DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded')
-        # We don't support PDB, so no need fir DIA.
-        cmake_args.append('-DLLVM_ENABLE_DIA_SDK=OFF')
+        cmake_args.extend(
+            (
+                '-DLLVM_USE_CRT_RELEASE=MT',
+                '-DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded',
+                '-DLLVM_ENABLE_DIA_SDK=OFF',
+            )
+        )
 
     # Make distribution much smaller by linking to dynamic library
     # instead of static linkage.
@@ -198,8 +200,9 @@ def construct_cmake_flags(
     # Also not working for Linux and macOS because of signal chaining.
     # TODO: Enable after LLVM distribution patching.
     if not host_is_windows():
-        cmake_args.append("-DLLVM_BUILD_LLVM_DYLIB=OFF")
-        cmake_args.append("-DLLVM_LINK_LLVM_DYLIB=OFF")
+        cmake_args.extend(
+            ("-DLLVM_BUILD_LLVM_DYLIB=OFF", "-DLLVM_LINK_LLVM_DYLIB=OFF")
+        )
 
     return cmake_args
 
@@ -218,7 +221,7 @@ def run_command(command: List[str], dry_run):
     else:
         command = [shlex.quote(arg) for arg in command]
         command = ' '.join(command)
-        print("Running command: " + command)
+        print(f"Running command: {command}")
 
     if not dry_run:
         subprocess.run(command, shell=True, check=True)
@@ -325,12 +328,7 @@ def build_distribution(args):
         building_bootstrap = num_stages > 1 and stage == 1
         building_final = stage == num_stages
 
-        if building_bootstrap:
-            # We only need a host target to start a bootstrap.
-            targets = [host_llvm_target()]
-        else:
-            # None targets means all available targets.
-            targets = None
+        targets = [host_llvm_target()] if building_bootstrap else None
         if building_final:
             install_path = args.install_path
             build_targets = args.build_targets
@@ -370,7 +368,7 @@ def build_distribution(args):
 
 
 def create_archive(input_directory, output_path, compression=host_default_compression()) -> str:
-    print("Creating archive " + output_path + " from " + input_directory)
+    print(f"Creating archive {output_path} from {input_directory}")
     base_directory, archive_prefix = os.path.split(os.path.normpath(input_directory))
     return shutil.make_archive(output_path, compression, base_directory, archive_prefix)
 
@@ -404,15 +402,9 @@ def setup_environment(args):
     elif shutil.which('git') is None:
         sys.exit("'git' is not found. Install or provide via --git argument.")
     if host_is_windows():
-        if args.vsdevcmd:
-            vsdevcmd = args.vsdevcmd
-        else:
-            vsdevcmd = detect_vsdevcmd()
+        vsdevcmd = args.vsdevcmd or detect_vsdevcmd()
     elif host_is_darwin():
-        if args.isysroot:
-            isysroot = args.isysroot
-        else:
-            isysroot = detect_xcode_sdk_path()
+        isysroot = args.isysroot or detect_xcode_sdk_path()
 
 
 def main():

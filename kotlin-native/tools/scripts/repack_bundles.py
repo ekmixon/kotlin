@@ -6,12 +6,16 @@ import os.path
 import shutil
 
 if len(sys.argv) != 3:
-    print('Usage: ' + sys.argv[0] + ' <kotlin_version> <input_dir>')
+    print(f'Usage: {sys.argv[0]} <kotlin_version> <input_dir>')
     sys.exit(0)
 
 kotlinVersion = sys.argv[1]
 inputDir = sys.argv[2]
-print('Repacking bundles for Kotlin/Native version ' + kotlinVersion + ' from ' + inputDir)
+print(
+    f'Repacking bundles for Kotlin/Native version {kotlinVersion} from '
+    + inputDir
+)
+
 os.chdir(inputDir)
 
 bundles = [f for f in os.listdir('.')

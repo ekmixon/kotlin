@@ -43,18 +43,17 @@ def log(msg):
 
 def exelog(stmt):
     if exe_logging:
-        f = open(os.getenv('HOME', '') + "/lldbexelog.txt", "a")
-        f.write(stmt())
-        f.write("\n")
-        f.close()
+        with open(os.getenv('HOME', '') + "/lldbexelog.txt", "a") as f:
+            f.write(stmt())
+            f.write("\n")
 
 def bench(start, msg):
     if bench_logging:
-        print("{}: {}".format(msg(), time.monotonic() - start))
+        print(f"{msg()}: {time.monotonic() - start}")
 
 def evaluate(expr):
     result = lldb.debugger.GetSelectedTarget().EvaluateExpression(expr)
-    log(lambda : "evaluate: {} => {}".format(expr, result))
+    log(lambda: f"evaluate: {expr} => {result}")
     return result
 
 
@@ -89,8 +88,12 @@ def _type_info_by_address(address, debugger = lldb.debugger):
     process = target.GetProcess()
     thread = process.GetSelectedThread()
     frame = thread.GetSelectedFrame()
-    candidates = list(filter(lambda x: x.GetStartAddress().GetLoadAddress(target) == address, frame.module.symbols))
-    return candidates
+    return list(
+        filter(
+            lambda x: x.GetStartAddress().GetLoadAddress(target) == address,
+            frame.module.symbols,
+        )
+    )
 
 def is_instance_of(addr, typeinfo):
     return evaluate("(bool)IsInstance({:#x}, {:#x})".format(addr, typeinfo)).GetValue() == "true"
@@ -223,7 +226,10 @@ class KonanHelperProvider(lldb.SBSyntheticValueProvider):
     def _deref_or_obj_summary(self, index, internal_dict = {}):
         value = self._read_value(index)
         if not value:
-            log(lambda : "_deref_or_obj_summary: value none, index:{}, type:{}".format(index, self._children[index].type()))
+            log(
+                lambda: f"_deref_or_obj_summary: value none, index:{index}, type:{self._children[index].type()}"
+            )
+
             return None
         return value.value if type_info(value) else value.deref.value
 
@@ -243,7 +249,7 @@ class KonanHelperProvider(lldb.SBSyntheticValueProvider):
                 writer.write(", ")
         if max_children_count < self._children_count:
             writer.write(', ...')
-        return "[{}]".format(writer.getvalue())
+        return f"[{writer.getvalue()}]"
 
 
 class KonanStringSyntheticProvider(KonanHelperProvider):
@@ -336,12 +342,13 @@ class KonanObjectSyntheticProvider(KonanHelperProvider):
 
     def to_short_string(self):
         log(lambda: "to_short_string:{:#x}".format(self._valobj.unsigned))
-        return super().to_string(lambda index: "{}: ...".format(self._field_name(index)))
+        return super().to_string(lambda index: f"{self._field_name(index)}: ...")
 
     def to_string(self):
         log(lambda: "to_string:{:#x}".format(self._valobj.unsigned))
-        return super().to_string(lambda index: "{}: {}".format(self._field_name(index),
-                                                               self._deref_or_obj_summary(index)))
+        return super().to_string(
+            lambda index: f"{self._field_name(index)}: {self._deref_or_obj_summary(index)}"
+        )
 
 class KonanArraySyntheticProvider(KonanHelperProvider):
     def __init__(self, valobj, internal_dict):
@@ -382,11 +389,11 @@ class KonanArraySyntheticProvider(KonanHelperProvider):
 
     def to_string(self):
         log(lambda: "to_string:{self._valobj.unsigned:#x}")
-        return super().to_string(lambda index: "{}".format(self._deref_or_obj_summary(index)))
+        return super().to_string(lambda index: f"{self._deref_or_obj_summary(index)}")
 
 class KonanZerroSyntheticProvider(lldb.SBSyntheticValueProvider):
     def __init__(self, valobj):
-        log(lambda: "KonanZerroSyntheticProvider::__init__ {}".format(valobj.name))
+        log(lambda: f"KonanZerroSyntheticProvider::__init__ {valobj.name}")
 
 
     def num_children(self):
@@ -454,7 +461,9 @@ class KonanProxyTypeProvider:
 
 
 def type_name_command(debugger, command, result, internal_dict):
-    result.AppendMessage(evaluate('(char *)Konan_DebugGetTypeName({})'.format(command)).summary)
+    result.AppendMessage(
+        evaluate(f'(char *)Konan_DebugGetTypeName({command})').summary
+    )
 
 
 __KONAN_VARIABLE = re.compile('kvar:(.*)#internal')
@@ -476,13 +485,13 @@ __TYPES_KONAN_TO_C = {
 
 
 def type_by_address_command(debugger, command, result, internal_dict):
-    result.AppendMessage("DEBUG: {}".format(command))
+    result.AppendMessage(f"DEBUG: {command}")
     tokens = command.split()
     target = debugger.GetSelectedTarget()
     process = target.GetProcess()
     thread = process.GetSelectedThread()
     types = _type_info_by_address(tokens[0])
-    result.AppendMessage("DEBUG: {}".format(types))
+    result.AppendMessage(f"DEBUG: {types}")
     for t in types:
         result.AppendMessage("{}: {:#x}".format(t.name, t.GetStartAddress().GetLoadAddress(target)))
 
@@ -495,7 +504,7 @@ def symbol_by_name_command(debugger, command, result, internal_dict):
     tokens = command.split()
     mask = re.compile(tokens[0])
     symbols = list(filter(lambda v: mask.match(v.name), frame.GetModule().symbols))
-    visited = list()
+    visited = []
     for symbol in symbols:
        name = symbol.name
        if name in visited:
@@ -511,29 +520,35 @@ def konan_globals_command(debugger, command, result, internal_dict):
     frame = thread.GetSelectedFrame()
 
     konan_variable_symbols = list(filter(lambda v: __KONAN_VARIABLE.match(v.name), frame.GetModule().symbols))
-    visited = list()
+    visited = []
     for symbol in konan_variable_symbols:
-       name = __KONAN_VARIABLE.search(symbol.name).group(1)
+        name = __KONAN_VARIABLE.search(symbol.name).group(1)
 
-       if name in visited:
-           continue
-       visited.append(name)
+        if name in visited:
+            continue
+        visited.append(name)
 
-       getters = list(filter(lambda v: re.match('^kfun:<get-{}>\\(\\).*$'.format(name), v.name), frame.module.symbols))
-       if not getters:
-           result.AppendMessage("storage not found for name:{}".format(name))
-           continue
+        getters = list(
+            filter(
+                lambda v: re.match(f'^kfun:<get-{name}>\\(\\).*$', v.name),
+                frame.module.symbols,
+            )
+        )
 
-       getter_functions = frame.module.FindFunctions(getters[0].name)
-       if not getter_functions:
-           continue
+        if not getters:
+            result.AppendMessage(f"storage not found for name:{name}")
+            continue
 
-       address = getter_functions[0].function.GetStartAddress().GetLoadAddress(target)
-       type = __KONAN_VARIABLE_TYPE.search(getters[0].name).group(2)
-       (c_type, extractor) = __TYPES_KONAN_TO_C[type] if type in __TYPES_KONAN_TO_C.keys() else ('ObjHeader *', lambda v: kotlin_object_type_summary(v))
-       value = evaluate('(({0} (*)()){1:#x})()'.format(c_type, address))
-       str_value = extractor(value)
-       result.AppendMessage('{} {}: {}'.format(type, name, str_value))
+        getter_functions = frame.module.FindFunctions(getters[0].name)
+        if not getter_functions:
+            continue
+
+        address = getter_functions[0].function.GetStartAddress().GetLoadAddress(target)
+        type = __KONAN_VARIABLE_TYPE.search(getters[0].name).group(2)
+        (c_type, extractor) = __TYPES_KONAN_TO_C[type] if type in __TYPES_KONAN_TO_C.keys() else ('ObjHeader *', lambda v: kotlin_object_type_summary(v))
+        value = evaluate('(({0} (*)()){1:#x})()'.format(c_type, address))
+        str_value = extractor(value)
+        result.AppendMessage(f'{type} {name}: {str_value}')
 
 
 def __lldb_init_module(debugger, _):
@@ -556,7 +571,16 @@ def __lldb_init_module(debugger, _):
         --category Kotlin\
     ')
     debugger.HandleCommand('type category enable Kotlin')
-    debugger.HandleCommand('command script add -f {}.type_name_command type_name'.format(__name__))
-    debugger.HandleCommand('command script add -f {}.type_by_address_command type_by_address'.format(__name__))
-    debugger.HandleCommand('command script add -f {}.symbol_by_name_command symbol_by_name'.format(__name__))
+    debugger.HandleCommand(
+        f'command script add -f {__name__}.type_name_command type_name'
+    )
+
+    debugger.HandleCommand(
+        f'command script add -f {__name__}.type_by_address_command type_by_address'
+    )
+
+    debugger.HandleCommand(
+        f'command script add -f {__name__}.symbol_by_name_command symbol_by_name'
+    )
+
     log(lambda: "init end")
